@@ -168,28 +168,30 @@ function generateId() {
 
 const defaultState: AppState = {
   brand: {
-    brandName: "",
-    brandAliases: "",
+    brandName: "御盾",
+    brandAliases: "YuDun, 西安守界御盾信息安全技术有限责任公司",
     websites: [],
-    industry: "",
-    keywords: "",
-    description: "",
+    industry: "移动应用安全与 App 加固",
+    keywords: "Android 加固, iOS 加固, App 安全, 代码保护, 移动应用安全",
+    description:
+      "御盾面向移动应用提供 Android 与 iOS 安全加固、代码保护及安全交付能力。正式域名与对外口径将在部署阶段补齐。",
   },
-  provider: "chatgpt",
-  activeProviders: ["chatgpt"],
-  country: "US",
-  prompt: "What are the best tools in your category in 2026? Include sources.",
+  provider: "baidu_ai_search",
+  activeProviders: ["baidu_ai_search"],
+  country: "CN",
+  prompt:
+    "中国市场有哪些可信的移动 App 安全加固服务？御盾是否被提及？仅列出可核验来源。",
   customPrompts: [
     {
-      text: "How visible is {brand} compared to its competitors? Include sources.",
-      tags: [],
+      text: "在 Android 和 iOS App 加固服务中，{brand} 的公开可见性如何？仅列出可核验来源。",
+      tags: ["品牌可见性", "中国市场"],
     },
     {
-      text: "What are the top 3 reasons to choose {brand} based on trusted sources?",
-      tags: [],
+      text: "企业评估移动应用安全供应商时应核验哪些能力？公开资料如何描述 {brand}？",
+      tags: ["采购决策", "证据"],
     },
   ],
-  personas: "CMO\nSEO Lead\nProduct Marketing Manager\nFounder",
+  personas: "企业安全负责人\n移动研发负责人\n合规负责人\n技术采购负责人",
   fanoutPrompts: [],
   niche: "",
   nicheQueries: [],
@@ -1023,6 +1025,7 @@ export function SovereignDashboard({
         brandMentions: findMentions(answerText, brandTerms),
         competitorMentions: findMentions(answerText, competitorTerms),
         country: state.country,
+        evidence: data.evidence,
       };
     } catch {
       return null;
@@ -1053,7 +1056,7 @@ export function SovereignDashboard({
 
       if (runs.length === 0) {
         setMessage(
-          "All scrape requests failed. Check your Bright Data config.",
+          "全部可见性请求失败，请检查所选渠道的 API 配置。",
         );
         return;
       }
@@ -1955,7 +1958,7 @@ ${exampleJson}`,
             {tabMeta[activeTab].title}
           </h1>
           <label className="hidden text-sm text-th-text-muted sm:inline">
-            Models
+            渠道
           </label>
           <div className="flex items-center gap-1 overflow-x-auto">
             {ALL_PROVIDERS.map((p) => {
@@ -1983,8 +1986,8 @@ ${exampleJson}`,
                   }`}
                   title={
                     active
-                      ? `Deselect ${PROVIDER_LABELS[p]}`
-                      : `Select ${PROVIDER_LABELS[p]}`
+                      ? `取消选择 ${PROVIDER_LABELS[p]}`
+                      : `选择 ${PROVIDER_LABELS[p]}`
                   }
                 >
                   {PROVIDER_LABELS[p]}
@@ -2005,7 +2008,7 @@ ${exampleJson}`,
               title={
                 state.activeProviders.length === ALL_PROVIDERS.length
                   ? "Select only one"
-                  : "Select all models"
+                  : "选择全部渠道"
               }
             >
               {state.activeProviders.length === ALL_PROVIDERS.length
@@ -2016,7 +2019,7 @@ ${exampleJson}`,
 
           {/* Country / geo selector */}
           <label className="hidden text-sm text-th-text-muted lg:inline">
-            Region
+            地区
           </label>
           <select
             value={state.country}
@@ -2024,7 +2027,7 @@ ${exampleJson}`,
               setState((prev) => ({ ...prev, country: e.target.value }))
             }
             className="rounded-md border border-th-border bg-th-card-alt px-2 py-1 text-xs text-th-text-secondary hover:bg-th-card-hover"
-            title="Country to run AI-visibility checks from (Bright Data geolocation)"
+            title="可见性检查地区；消费端快照渠道会将其作为地理位置参数"
           >
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>

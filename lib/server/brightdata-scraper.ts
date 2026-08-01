@@ -10,7 +10,7 @@ const ProviderSchema = z.enum([
   "grok",
 ]);
 
-type Provider = z.infer<typeof ProviderSchema>;
+export type BrightDataProvider = z.infer<typeof ProviderSchema>;
 
 const OUTPUT_CACHE_TTL_MS = 1000 * 60 * 20;
 
@@ -19,7 +19,7 @@ const inMemoryCache = new Map<
   { expiresAt: number; value: NormalizedScrapeResult }
 >();
 
-const providerToDatasetEnv: Record<Provider, string> = {
+const providerToDatasetEnv: Record<BrightDataProvider, string> = {
   chatgpt: "BRIGHT_DATA_DATASET_CHATGPT",
   perplexity: "BRIGHT_DATA_DATASET_PERPLEXITY",
   copilot: "BRIGHT_DATA_DATASET_COPILOT",
@@ -28,7 +28,7 @@ const providerToDatasetEnv: Record<Provider, string> = {
   grok: "BRIGHT_DATA_DATASET_GROK",
 };
 
-const providerBaseUrl: Record<Provider, string> = {
+const providerBaseUrl: Record<BrightDataProvider, string> = {
   chatgpt: "https://chatgpt.com/",
   perplexity: "https://www.perplexity.ai/",
   copilot: "https://copilot.microsoft.com/",
@@ -38,14 +38,14 @@ const providerBaseUrl: Record<Provider, string> = {
 };
 
 type ScrapeRequest = {
-  provider: Provider;
+  provider: BrightDataProvider;
   prompt: string;
   requireSources?: boolean;
   country?: string;
 };
 
 type NormalizedScrapeResult = {
-  provider: Provider;
+  provider: BrightDataProvider;
   prompt: string;
   answer: string;
   sources: string[];
@@ -59,7 +59,7 @@ function getApiKey() {
   return process.env.BRIGHT_DATA_KEY;
 }
 
-function getDatasetId(provider: Provider) {
+function getDatasetId(provider: BrightDataProvider) {
   return process.env[providerToDatasetEnv[provider]];
 }
 

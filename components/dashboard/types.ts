@@ -4,7 +4,29 @@ export type Provider =
   | "copilot"
   | "gemini"
   | "google_ai"
-  | "grok";
+  | "grok"
+  | "baidu_ai_search"
+  | "hunyuan_api"
+  | "deepseek_api"
+  | "doubao_api"
+  | "qwen_api"
+  | "kimi_api";
+
+export type EvidenceClass =
+  | "consumer_product_snapshot"
+  | "grounded_search_api"
+  | "model_api";
+
+export type EvidenceReceipt = {
+  id: string;
+  evidenceClass: EvidenceClass;
+  channel: "consumer-ui" | "official-api";
+  contentSha256: string;
+  rawSha256: string;
+  persisted: boolean;
+  upstreamRequestId?: string;
+  model?: string;
+};
 
 export type ScrapeRun = {
   provider: Provider;
@@ -22,6 +44,8 @@ export type ScrapeRun = {
   competitorMentions: string[];
   /** ISO country code the run was executed in (Bright Data geolocation) */
   country?: string;
+  /** Immutable server-side receipt. Raw upstream payloads never enter browser state. */
+  evidence?: EvidenceReceipt;
 };
 
 /** Structured section inside a battlecard */
@@ -86,6 +110,12 @@ export const ALL_PROVIDERS: Provider[] = [
   "gemini",
   "google_ai",
   "grok",
+  "baidu_ai_search",
+  "hunyuan_api",
+  "deepseek_api",
+  "doubao_api",
+  "qwen_api",
+  "kimi_api",
 ];
 
 export const PROVIDER_LABELS: Record<Provider, string> = {
@@ -95,10 +125,17 @@ export const PROVIDER_LABELS: Record<Provider, string> = {
   gemini: "Gemini",
   google_ai: "Google AI",
   grok: "Grok",
+  baidu_ai_search: "百度 AI 搜索",
+  hunyuan_api: "腾讯混元 API",
+  deepseek_api: "DeepSeek API",
+  doubao_api: "豆包方舟 API",
+  qwen_api: "通义千问 API",
+  kimi_api: "Kimi API",
 };
 
 /** Countries available for geo-scoped AI-visibility tracking (Bright Data geolocation, 2-letter codes) */
 export const COUNTRIES: { code: string; label: string }[] = [
+  { code: "CN", label: "中国大陆" },
   { code: "US", label: "United States" },
   { code: "GB", label: "United Kingdom" },
   { code: "CA", label: "Canada" },

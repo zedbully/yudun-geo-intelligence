@@ -27,6 +27,23 @@
 
 ---
 
+## 御盾 GEO Intelligence Fork
+
+本分支在上游可见性看板基础上增加了一套面向御盾的独立 GEO 工作台，部署前无需域名或服务器：
+
+- 默认品牌、提示词、角色与地区已切换为御盾、中国市场和移动 App 安全场景。
+- 新增百度 AI 搜索、腾讯混元、DeepSeek、豆包方舟、通义千问和 Kimi 官方 API 入口。
+- 消费端采集、带来源检索 API、普通模型 API 分属三种证据等级；只有上游确实返回来源链接时，API 结果才会标为“带来源检索 API”。
+- 每次运行生成内容与原始响应 SHA-256；配置 Supabase 并执行 `001_kv_store.sql`、`002_geo_evidence_receipts.sql` 后，原始响应写入不可更新/删除的服务端证据表，浏览器只接收回执。
+- `GET /api/geoflow/export` 提供带 Bearer 密钥的只读证据导出，不写入 GEOFlow、不发布内容。
+- 可用 `YUDUN_BASIC_AUTH_USER` 与 `YUDUN_BASIC_AUTH_PASSWORD` 在正式接入登录系统前保护整站。
+
+这里的“官方模型 API”不等同于对应的公开消费者 App/网页结果；没有消费者端快照或带来源检索回执时，不应据此声称御盾已在某个公开 AI 产品中获得曝光。
+
+国内渠道与访问控制的变量都列在 `.env.example`。未配置 Supabase 时，界面会明确显示“未入账”；这适合本地调试，不应作为正式证据闭环。
+
+---
+
 > 🌐 **Built with [Bright Data](https://brightdata.com/?utm_source=geo-tracker-os)** — the world's leading web data platform.
 > GEO/AEO Tracker uses Bright Data's AI Scraper API to reliably collect structured responses from 6 AI models.
 > [Get your API key →](https://brightdata.com/?utm_source=geo-tracker-os)

@@ -140,7 +140,19 @@ const PROVIDER_COLORS: Record<Provider, string> = {
   gemini: "#4285f4",
   google_ai: "#ea4335",
   grok: "#6b7280",
+  baidu_ai_search: "#2563eb",
+  hunyuan_api: "#7c3aed",
+  deepseek_api: "#0891b2",
+  doubao_api: "#f97316",
+  qwen_api: "#8b5cf6",
+  kimi_api: "#111827",
 };
+
+const EVIDENCE_LABELS = {
+  consumer_product_snapshot: "消费端快照",
+  grounded_search_api: "带来源检索 API",
+  model_api: "模型 API",
+} as const;
 
 function ProviderBadge({ provider }: { provider: Provider }) {
   const bg = PROVIDER_COLORS[provider] ?? "#4285f4";
@@ -198,6 +210,19 @@ function ModelResponseCard({
             </span>
           )}
           <SentimentBadge sentiment={run.sentiment ?? "neutral"} />
+          {run.evidence && (
+            <span
+              className={`rounded-full border px-2 py-0.5 text-xs ${
+                run.evidence.persisted
+                  ? "border-th-success/30 bg-th-success-soft text-th-success"
+                  : "border-th-border bg-th-card-alt text-th-text-muted"
+              }`}
+              title={`${run.evidence.channel} · SHA-256 ${run.evidence.contentSha256}`}
+            >
+              {EVIDENCE_LABELS[run.evidence.evidenceClass]}
+              {run.evidence.persisted ? " · 已入账" : " · 未入账"}
+            </span>
+          )}
           {run.brandMentions?.length > 0 && (
             <span className="text-xs text-th-brand-text">
               {run.brandMentions.length} brand mention{run.brandMentions.length > 1 ? "s" : ""}
@@ -236,6 +261,17 @@ function ModelResponseCard({
             />
           ) : (
             <span className="italic text-th-text-muted">No response text captured — try re-running this prompt.</span>
+          )}
+        </div>
+      )}
+
+      {expanded && run.evidence && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-th-border/40 px-4 py-2 text-xs text-th-text-muted">
+          <span>证据 ID：{run.evidence.id}</span>
+          <span>内容哈希：{run.evidence.contentSha256.slice(0, 16)}…</span>
+          {run.evidence.model && <span>模型：{run.evidence.model}</span>}
+          {run.evidence.upstreamRequestId && (
+            <span>上游回执：{run.evidence.upstreamRequestId}</span>
           )}
         </div>
       )}
