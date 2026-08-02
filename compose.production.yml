@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production
+    environment:
+      HOSTNAME: "0.0.0.0"
     ports:
       - "127.0.0.1:18100:3000"
     volumes:
