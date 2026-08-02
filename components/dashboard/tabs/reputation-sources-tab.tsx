@@ -145,6 +145,8 @@ const PROVIDER_COLORS: Record<Provider, string> = {
   deepseek_api: "#0891b2",
   doubao_api: "#f97316",
   qwen_api: "#8b5cf6",
+  ernie_api: "#2563eb",
+  glm_api: "#0f766e",
   kimi_api: "#111827",
 };
 

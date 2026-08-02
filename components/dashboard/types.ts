@@ -10,6 +10,8 @@ export type Provider =
   | "deepseek_api"
   | "doubao_api"
   | "qwen_api"
+  | "ernie_api"
+  | "glm_api"
   | "kimi_api";
 
 export type EvidenceClass =
@@ -115,6 +117,8 @@ export const ALL_PROVIDERS: Provider[] = [
   "deepseek_api",
   "doubao_api",
   "qwen_api",
+  "ernie_api",
+  "glm_api",
   "kimi_api",
 ];
 
@@ -130,6 +134,8 @@ export const PROVIDER_LABELS: Record<Provider, string> = {
   deepseek_api: "DeepSeek API",
   doubao_api: "豆包方舟 API",
   qwen_api: "通义千问 API",
+  ernie_api: "文心大模型 API",
+  glm_api: "智谱 GLM API",
   kimi_api: "Kimi API",
 };
 

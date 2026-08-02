@@ -15,6 +15,8 @@ const InputSchema = z.object({
     "deepseek_api",
     "doubao_api",
     "qwen_api",
+    "ernie_api",
+    "glm_api",
     "kimi_api",
   ]),
   prompt: z.string().min(3),

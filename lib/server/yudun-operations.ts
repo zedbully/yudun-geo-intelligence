@@ -187,8 +187,18 @@ const PROVIDER_ENV: Partial<Record<Provider, string>> = {
   deepseek_api: "DEEPSEEK_API_KEY",
   doubao_api: "DOUBAO_API_KEY",
   qwen_api: "QWEN_API_KEY",
+  ernie_api: "ERNIE_API_KEY",
+  glm_api: "GLM_API_KEY",
   kimi_api: "KIMI_API_KEY",
 };
+
+const QIANFAN_HOSTED_PROVIDERS = new Set<Provider>([
+  "deepseek_api",
+  "qwen_api",
+  "ernie_api",
+  "glm_api",
+  "kimi_api",
+]);
 
 export function configuredProviders(): Provider[] {
   const allowed = new Set(
@@ -198,7 +208,13 @@ export function configuredProviders(): Provider[] {
       .filter(Boolean),
   );
   return (Object.entries(PROVIDER_ENV) as Array<[Provider, string]>)
-    .filter(([provider, envName]) => allowed.has(provider) && Boolean(process.env[envName]))
+    .filter(
+      ([provider, envName]) =>
+        allowed.has(provider) &&
+        (Boolean(process.env[envName]) ||
+          (QIANFAN_HOSTED_PROVIDERS.has(provider) &&
+            Boolean(process.env.BAIDU_QIANFAN_API_KEY))),
+    )
     .filter(([provider]) => provider.includes("_api") || provider === "baidu_ai_search" || Boolean(process.env.BRIGHT_DATA_KEY))
     .map(([provider]) => provider);
 }

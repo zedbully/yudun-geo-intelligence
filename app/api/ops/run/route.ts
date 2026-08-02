@@ -40,19 +40,53 @@ export async function POST(request: NextRequest) {
     0,
     Number.parseInt(process.env.YUDUN_GEO_MAX_PROVIDER_RUNS ?? "6", 10) || 0,
   );
-  const planned = YUDUN_SITES.flatMap((site) =>
-    providers.map((provider) => ({ site, provider })),
-  )
-    .filter(({ site, provider }) => {
-      if (force) return true;
-      return !(evidenceHistory ?? []).some(
-        (receipt) =>
-          receipt.site_domain === site.domain &&
-          receipt.provider === provider &&
-          Date.now() - new Date(receipt.captured_at).getTime() < freshnessWindowMs,
-      );
-    })
-    .slice(0, maxProviderRuns);
+  const latestEvidenceByPair = new Map<string, number>();
+  for (const receipt of evidenceHistory ?? []) {
+    const capturedAt = new Date(receipt.captured_at).getTime();
+    const key = `${receipt.site_domain}:${receipt.provider}`;
+    if (capturedAt > (latestEvidenceByPair.get(key) ?? 0)) {
+      latestEvidenceByPair.set(key, capturedAt);
+    }
+  }
+  const providerQueues = YUDUN_SITES.map((site, siteIndex) =>
+    providers
+      .map((provider, providerIndex) => ({
+        site,
+        provider,
+        providerIndex,
+        lastCapturedAt:
+          latestEvidenceByPair.get(`${site.domain}:${provider}`) ?? 0,
+      }))
+      .filter(
+        ({ lastCapturedAt }) =>
+          force || Date.now() - lastCapturedAt >= freshnessWindowMs,
+      )
+      .sort((left, right) => {
+        if (left.lastCapturedAt !== right.lastCapturedAt) {
+          return left.lastCapturedAt - right.lastCapturedAt;
+        }
+        const leftOffset =
+          (left.providerIndex - siteIndex + providers.length) % providers.length;
+        const rightOffset =
+          (right.providerIndex - siteIndex + providers.length) % providers.length;
+        return leftOffset - rightOffset;
+      }),
+  );
+  const planned: Array<{
+    site: (typeof YUDUN_SITES)[number];
+    provider: (typeof providers)[number];
+  }> = [];
+  while (planned.length < maxProviderRuns) {
+    let added = false;
+    for (const queue of providerQueues) {
+      const candidate = queue.shift();
+      if (!candidate) continue;
+      planned.push({ site: candidate.site, provider: candidate.provider });
+      added = true;
+      if (planned.length >= maxProviderRuns) break;
+    }
+    if (!added) break;
+  }
   const visibility = [];
   for (const { site, provider } of planned) {
     try {
