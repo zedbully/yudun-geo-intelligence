@@ -1,0 +1,21 @@
+services:
+  yudun-geo-intelligence:
+    container_name: yudun-geo-intelligence
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    image: yudun-geo-intelligence:production
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - "127.0.0.1:18100:3000"
+    volumes:
+      - ./data:/data
+    networks:
+      - geoflow_internal
+
+networks:
+  geoflow_internal:
+    external: true
+    name: geoflow-laravel-prod_default

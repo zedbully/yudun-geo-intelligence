@@ -8,6 +8,7 @@ export async function runVisibilityProvider(input: {
   prompt: string;
   requireSources?: boolean;
   country?: string;
+  siteDomain?: string;
 }) {
   if (isDomesticProvider(input.provider)) {
     const result = await runDomesticAi(input.provider, input.prompt);
@@ -20,6 +21,7 @@ export async function runVisibilityProvider(input: {
       sources: result.sources,
       raw: result.raw,
       country: input.country,
+      siteDomain: input.siteDomain,
       model: result.model,
       upstreamRequestId: result.upstreamRequestId,
       createdAt: result.createdAt,
@@ -48,6 +50,7 @@ export async function runVisibilityProvider(input: {
     sources: result.sources,
     raw: result.raw,
     country: input.country,
+    siteDomain: input.siteDomain,
     upstreamRequestId: result.snapshotId,
     createdAt: result.createdAt,
   });

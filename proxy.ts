@@ -46,7 +46,10 @@ export function proxy(req: NextRequest) {
   const authUser = process.env.YUDUN_BASIC_AUTH_USER;
   const authPassword = process.env.YUDUN_BASIC_AUTH_PASSWORD;
 
-  const hasRouteLevelAuth = path === "/api/geoflow/export";
+  const hasRouteLevelAuth =
+    path === "/api/geoflow/export" ||
+    path === "/api/health" ||
+    path.startsWith("/api/ops/");
   if ((authUser || authPassword) && !hasRouteLevelAuth) {
     if (!authUser || !authPassword) {
       return NextResponse.json(
