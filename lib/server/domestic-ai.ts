@@ -196,11 +196,19 @@ export async function runDomesticAi(
   };
 
   if (provider === "baidu_ai_search") {
+    const searchTopK = Math.min(
+      20,
+      Math.max(
+        1,
+        Number.parseInt(process.env.BAIDU_AI_SEARCH_TOP_K || "10", 10) || 10,
+      ),
+    );
     Object.assign(body, {
       search_source:
         process.env.BAIDU_AI_SEARCH_SOURCE || "baidu_search_v2",
-      resource_type_filter: [{ type: "web", top_k: 5 }],
-      enable_deep_search: false,
+      resource_type_filter: [{ type: "web", top_k: searchTopK }],
+      enable_deep_search:
+        process.env.BAIDU_AI_SEARCH_DEEP_SEARCH !== "false",
       enable_followup_query: false,
     });
   }

@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   const providers = configuredProviders();
   const maxProviderRuns = Math.max(
     0,
-    Number.parseInt(process.env.YUDUN_GEO_MAX_PROVIDER_RUNS ?? "6", 10) || 0,
+    Number.parseInt(process.env.YUDUN_GEO_MAX_PROVIDER_RUNS ?? "36", 10) || 0,
   );
   const latestEvidenceByPair = new Map<string, number>();
   for (const receipt of evidenceHistory ?? []) {
@@ -88,29 +88,45 @@ export async function POST(request: NextRequest) {
     if (!added) break;
   }
   const visibility = [];
-  for (const { site, provider } of planned) {
-    try {
-      const result = await runVisibilityProvider({
-        provider,
-        prompt: site.visibilityPrompt,
-        country: "CN",
-        siteDomain: site.domain,
-      });
-      visibility.push({
-        domain: site.domain,
-        provider,
-        status: "completed",
-        evidenceId: result.evidence.id,
-        persisted: result.evidence.persisted,
-      });
-    } catch (error) {
-      visibility.push({
-        domain: site.domain,
-        provider,
-        status: "failed",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
+  const providerConcurrency = Math.min(
+    12,
+    Math.max(
+      1,
+      Number.parseInt(
+        process.env.YUDUN_GEO_PROVIDER_CONCURRENCY ?? "6",
+        10,
+      ) || 6,
+    ),
+  );
+  for (let offset = 0; offset < planned.length; offset += providerConcurrency) {
+    const batch = planned.slice(offset, offset + providerConcurrency);
+    const batchResults = await Promise.all(
+      batch.map(async ({ site, provider }) => {
+        try {
+          const result = await runVisibilityProvider({
+            provider,
+            prompt: site.visibilityPrompt,
+            country: "CN",
+            siteDomain: site.domain,
+          });
+          return {
+            domain: site.domain,
+            provider,
+            status: "completed" as const,
+            evidenceId: result.evidence.id,
+            persisted: result.evidence.persisted,
+          };
+        } catch (error) {
+          return {
+            domain: site.domain,
+            provider,
+            status: "failed" as const,
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
+        }
+      }),
+    );
+    visibility.push(...batchResults);
   }
 
   return NextResponse.json({
