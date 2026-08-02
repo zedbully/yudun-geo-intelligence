@@ -52,7 +52,7 @@ const CONFIG: Record<DomesticProvider, ProviderConfig> = {
     baseUrlEnv: "DOUBAO_BASE_URL",
     modelEnv: "DOUBAO_MODEL",
     defaultBaseUrl: "https://ark.cn-beijing.volces.com/api/v3",
-    defaultModel: "doubao-seed-2-0-lite-260215",
+    defaultModel: "doubao-seed-2-0-pro-260215",
   },
   qwen_api: {
     apiKeyEnv: "QWEN_API_KEY",

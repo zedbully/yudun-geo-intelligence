@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   const providers = configuredProviders();
   const maxProviderRuns = Math.max(
     0,
-    Number.parseInt(process.env.YUDUN_GEO_MAX_PROVIDER_RUNS ?? "36", 10) || 0,
+    Number.parseInt(process.env.YUDUN_GEO_MAX_PROVIDER_RUNS ?? "42", 10) || 0,
   );
   const latestEvidenceByPair = new Map<string, number>();
   for (const receipt of evidenceHistory ?? []) {
@@ -93,9 +93,9 @@ export async function POST(request: NextRequest) {
     Math.max(
       1,
       Number.parseInt(
-        process.env.YUDUN_GEO_PROVIDER_CONCURRENCY ?? "6",
+        process.env.YUDUN_GEO_PROVIDER_CONCURRENCY ?? "7",
         10,
-      ) || 6,
+      ) || 7,
     ),
   );
   for (let offset = 0; offset < planned.length; offset += providerConcurrency) {
