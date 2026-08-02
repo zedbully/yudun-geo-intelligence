@@ -154,9 +154,9 @@ export async function runDomesticAi(
   prompt: string,
 ): Promise<DomesticAiResult> {
   const config = CONFIG[provider];
-  const directApiKey = process.env[config.apiKeyEnv];
+  const directApiKey = process.env[config.apiKeyEnv]?.trim() || undefined;
   const qianfanApiKey = config.qianfanDefaultModel
-    ? process.env.BAIDU_QIANFAN_API_KEY
+    ? process.env.BAIDU_QIANFAN_API_KEY?.trim() || undefined
     : undefined;
   const apiKey = directApiKey ?? qianfanApiKey;
   if (!apiKey) {
@@ -167,13 +167,15 @@ export async function runDomesticAi(
   }
 
   const usingQianfanGateway = !directApiKey && Boolean(qianfanApiKey);
+  const configuredBaseUrl = process.env[config.baseUrlEnv]?.trim();
+  const configuredModel = process.env[config.modelEnv]?.trim();
   const baseUrl =
-    process.env[config.baseUrlEnv] ??
+    configuredBaseUrl ||
     (usingQianfanGateway
-      ? process.env.QIANFAN_BASE_URL || QIANFAN_BASE_URL
+      ? process.env.QIANFAN_BASE_URL?.trim() || QIANFAN_BASE_URL
       : config.defaultBaseUrl);
   const model =
-    process.env[config.modelEnv] ??
+    configuredModel ||
     (usingQianfanGateway
       ? config.qianfanDefaultModel || config.defaultModel
       : config.defaultModel);
